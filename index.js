@@ -32,9 +32,17 @@ connectToMongo();
 
 app.get('/api/data', async (req, res) => {
   try {
+    const searchTickerList = Object.values(req.query);
     const collection = db.collection(collectionName);
-    const data = await collection.find({}).sort({ tradeId: -1 }) .limit(10).toArray();
+
+    let data;
+    if (searchTickerList.length == 0) {
+      data = await collection.find({}).sort({ tradeId: -1 }).limit(10).toArray();
+    } else {
+      data = await collection.find({ ticker: { $in: searchTickerList } }).sort({ tradeId: -1 }).limit(1000).toArray();
+    }
     res.json(data.reverse());
+
   } catch (error) {
     console.error('Error fetching data from MongoDB:', error);
     res.status(500).json({ error: 'Internal Server Error' });
