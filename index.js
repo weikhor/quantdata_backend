@@ -44,8 +44,14 @@ app.get('/api/data', async (req, res) => {
     } else {
       optionsData = await collection.find({ ticker: { $in: searchTickerList } }).sort({ tradeId: -1 }).limit(10).toArray();
       pipeline.push({
-        ticker: { $in: searchTickerList },
-      },)
+        $match: {
+          $and: [
+            {
+              ticker: { $in: searchTickerList },
+            },
+          ],
+        }
+      })
     }
     pipeline = [...pipeline, ...optionsPipeline];
     let result = await collection.aggregate(pipeline).toArray();
@@ -59,7 +65,6 @@ app.get('/api/data', async (req, res) => {
         callTotalPremiumPriceInCents: callResult.totalPremiumPriceInCents,
         putTotalPremiumPriceInCents: putResult.totalPremiumPriceInCents
       });
-
       /*
       const sumVolume = optionsData.reduce((accumulator, currentValue) => {
         return accumulator + currentValue.volume;
@@ -67,7 +72,7 @@ app.get('/api/data', async (req, res) => {
 
       const sumTotalPremiumPriceInCents = optionsData.reduce((accumulator, currentValue) => {
         return accumulator + currentValue.premiumPriceInCents;
-      }, 0); */
+      }, 0);*/
 
     } else {
       res.json({
