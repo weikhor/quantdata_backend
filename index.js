@@ -32,7 +32,7 @@ async function connectToMongo() {
 
 connectToMongo();
 
-app.get('/api/data', async (req, res) => {
+app.get('/get_options', async (req, res) => {
   try {
     const searchTickerList = Object.values(req.query);
     const collection = db.collection(collectionName);
@@ -84,10 +84,40 @@ app.get('/api/data', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error fetching data from MongoDB:', error);
+    console.error('Error fetching data from options collection:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.get('/get_news', async (req, res) => {
+  try {
+    let collectionName = "news"
+    const collection = db.collection(collectionName);
+
+    let newsData = await collection.find({}).limit(10).toArray();
+    res.json({ newsData: newsData });
+
+  } catch (error) {
+    console.error('Error fetching data from news collection:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.get('/get_alerts', async (req, res) => {
+  try {
+    let collectionName = "alerts"
+    const collection = db.collection(collectionName);
+
+    let alertsData = await collection.find({}).limit(10).toArray();
+    res.json({ alertsData: alertsData });
+
+  } catch (error) {
+    console.error('Error fetching data from alerts collection:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
