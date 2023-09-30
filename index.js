@@ -133,6 +133,21 @@ app.get('/get_app_gainers_losers', async (req, res) => {
   }
 });
 
+app.get('/get_equities', async (req, res) => {
+  try {
+    let collectionName = "equities"
+    const collection = db.collection(collectionName);
+
+    let equitiesData = await collection.find({}).limit(10).toArray();
+    res.json({ equitiesData: equitiesData });
+
+  } catch (error) {
+    console.error('Error fetching data from equities collection:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
