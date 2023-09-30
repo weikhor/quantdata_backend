@@ -119,6 +119,21 @@ app.get('/get_alerts', async (req, res) => {
 });
 
 
+app.get('/get_app_gainers_losers', async (req, res) => {
+  try {
+    let collectionName = "app_gainers_losers"
+    const collection = db.collection(collectionName);
+
+    let appGainersLosersData = await collection.find({}).toArray();
+    res.json({ appGainersLosersData: appGainersLosersData[0] });
+
+  } catch (error) {
+    console.error('Error fetching data from app_gainers_losers collection:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
