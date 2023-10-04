@@ -40,7 +40,7 @@ app.get('/get_options', async (req, res) => {
     let optionsData;
     let pipeline = []
     if (searchTickerList.length == 0) {
-      optionsData = await collection.find({}).sort({ tradeId: -1 }).limit(10).toArray();
+      optionsData = await collection.find({}).sort({ tradeId: -1 }).limit(20).toArray();
     } else {
       optionsData = await collection.find({ ticker: { $in: searchTickerList } }).sort({ tradeId: -1 }).limit(10).toArray();
       pipeline.push({
@@ -92,9 +92,22 @@ app.get('/get_options', async (req, res) => {
 app.get('/get_news', async (req, res) => {
   try {
     let collectionName = "news"
-    const collection = db.collection(collectionName);
 
-    let newsData = await collection.find({}).limit(10).toArray();
+    const collection = db.collection(collectionName);
+    const searchTickerList = Object.values(req.query);
+
+    let newsData;
+    if (searchTickerList.length == 0) {
+      newsData = await collection.find({}).limit(10).toArray();
+    } else {
+      newsData = await collection.find({
+        "tickerMetadata": {
+          $elemMatch: { "ticker": { $in: searchTickerList } }
+        }
+      }).limit(10).toArray();
+    }
+
+
     res.json({ newsData: newsData });
 
   } catch (error) {
