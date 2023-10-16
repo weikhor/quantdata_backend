@@ -65,14 +65,6 @@ app.get('/get_options', async (req, res) => {
         callTotalPremiumPriceInCents: callResult.totalPremiumPriceInCents,
         putTotalPremiumPriceInCents: putResult.totalPremiumPriceInCents
       });
-      /*
-      const sumVolume = optionsData.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.volume;
-      }, 0);
-
-      const sumTotalPremiumPriceInCents = optionsData.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.premiumPriceInCents;
-      }, 0);*/
 
     } else {
       res.json({
@@ -96,15 +88,14 @@ app.get('/get_news', async (req, res) => {
     const collection = db.collection(collectionName);
     const searchTickerList = Object.values(req.query);
 
-    let newsData;
     if (searchTickerList.length == 0) {
-      newsData = await collection.find({}).limit(10).toArray();
+      newsData = await collection.find({}).sort({ _id: -1 }).limit(10).toArray();
     } else {
       newsData = await collection.find({
         "tickerMetadata": {
           $elemMatch: { "ticker": { $in: searchTickerList } }
         }
-      }).limit(10).toArray();
+      }).sort({ _id: -1 }).limit(10).toArray();
     }
 
 
@@ -122,7 +113,8 @@ app.get('/get_alerts', async (req, res) => {
     let collectionName = "alerts"
     const collection = db.collection(collectionName);
 
-    let alertsData = await collection.find({}).limit(10).toArray();
+    let alertsData = await collection.find({}).sort({ _id: -1 }).limit(10).toArray();
+    alertsData = alertsData.reverse();
     res.json({ alertsData: alertsData });
 
   } catch (error) {
@@ -137,7 +129,8 @@ app.get('/get_app_gainers_losers', async (req, res) => {
     let collectionName = "app_gainers_losers"
     const collection = db.collection(collectionName);
 
-    let appGainersLosersData = await collection.find({}).toArray();
+    let appGainersLosersData = await collection.find({}).sort({ _id: -1 }).limit(10).toArray();
+    appGainersLosersData = appGainersLosersData.reverse();
     res.json({ appGainersLosersData: appGainersLosersData[0] });
 
   } catch (error) {
@@ -151,7 +144,8 @@ app.get('/get_equities', async (req, res) => {
     let collectionName = "equities"
     const collection = db.collection(collectionName);
 
-    let equitiesData = await collection.find({}).limit(10).toArray();
+    let equitiesData = await collection.find({}).sort({ _id: -1 }).limit(10).toArray();
+    equitiesData = equitiesData.reverse();
     res.json({ equitiesData: equitiesData });
 
   } catch (error) {
